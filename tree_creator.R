@@ -5,10 +5,10 @@
 #To fix:
 #Do something with "weight" column (counts number of identical rows)
 #Add "year" (select/hide(?) by) and "count" (line weighting for path finder) columns to edge list
-#Add filter by year feature https://datastorm-open.github.io/visNetwork/options.html ("select by a column"... might not work with directed graphs)
+#Add filter by year feature https://datastorm-open.github.io/visNetwork/options.html ("select by a column"... might not work with directed graphs (?))
 #Use output from pathfinder to define group of edges with bolder styling
 #Add features like shortest_path() (igraph function) and time evolution from https://kateto.net/wp-content/uploads/2016/06/Polnet%202016%20R%20Network%20Visualization%20Workshop.pdf
-#Consider disabling smooth arrows to improve speed
+#Increase edge length to make plot clearer
 
 setwd("/Users/Tom/Desktop/R network")
 library(tidyverse)
@@ -143,8 +143,7 @@ for (i in 1:nrow(edges)) {
 #edges <- data.frame(edges, group = edgeTypes) #... turns out edges can't have groups, rip sort-by-year
 edges <- data.frame(edges, width = edgeWidths, color = edgeColors, arrows = edgeArrows)
 
-visNetwork(nodes, edges) %>% #Creates the visualisation... nice
-#  visEdges(arrows = "middle", physics = TRUE) %>% #... overwridden by earlier edgeArrows
+visNetwork(nodes, edges) %>% #Creates the visualisation
   visGroups(groupname = "hub", color = "black", shape = "dot") %>%
   visGroups(groupname = "human", shape = "box", color = list(
     background = "white",
@@ -152,8 +151,10 @@ visNetwork(nodes, edges) %>% #Creates the visualisation... nice
     highlight = "lightblue"
     )
   ) %>%
-  visEdges(hoverWidth = 3, selectionWidth = 4) %>% #changes size of nearby edges when edge or node is hovered, clicked... check how to enable hover in browser
-  visOptions(nodesIdSelection = list(values=humanIDs), selectedBy = "group") #adds drop-down ID selecter... need to alphabetise this
-    #add ", selectedBy = "year" once year column in node df
+  visEdges(hoverWidth = 3, selectionWidth = 6, physics = FALSE, smooth = FALSE) %>% #changes size of nearby edges when edge or node is hovered, clicked... check how to enable hover in browser. Turn physics and smooth arrows off for faster rendering.
+  visOptions(nodesIdSelection = list(values=humanIDs), selectedBy = "group")#%>% #adds drop-down ID selecter... need to alphabetise this
+  #visHierarchicalLayout() #Layout algorithm
+  #visIgraphLayout() #Computing coordinates with igraph decreases plotting time, but will disable physics and smooth arrows regardless of above
+  #add ", selectedBy = "year" once year column in node df
 
 
